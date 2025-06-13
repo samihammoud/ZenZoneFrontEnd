@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject var meditationHandler: MeditationHandler
+    @ObservedObject var meditationHandler: MeditationHandler
     @State private var searchText = ""
 
     var body: some View {
@@ -118,5 +118,4 @@ struct HomeView: View {
 
     return HomeView(meditationHandler: sampleMeditationHandler)
 }
-
 

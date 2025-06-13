@@ -8,6 +8,11 @@
 import SwiftUI
 import Foundation
 
+struct OpenAIChatMessage {
+    let role: String
+    let content: String
+}
+
 // MARK: - OpenAI API Response Models
 struct OpenAIResponse: Codable {
     struct Choice: Codable {
@@ -29,31 +34,42 @@ struct OpenAIError: Codable {
 
 // MARK: - OpenAI Chat Service
 class OpenAIChatService {
-    private let apiKey = "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"
+    let openAIKey = ProcessInfo.processInfo.environment["OPENAI_API_KEY"] ?? ""
 
-    func sendMessage(message: String, completion: @escaping (Result<String, Error>) -> Void) {
+    func sendMessage(messages: [OpenAIChatMessage], completion: @escaping (Result<String, Error>) -> Void) {
         guard let url = URL(string: "https://api.openai.com/v1/chat/completions") else {
             completion(.failure(NSError(domain: "InvalidURL", code: 1, userInfo: nil)))
             return
         }
-        
-
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.addValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.addValue("Bearer \(openAIKey)", forHTTPHeaderField: "Authorization")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
+        let requestMessages = messages.map { ["role": $0.role, "content": $0.content] }
         let body: [String: Any] = [
-            "model": "gpt-3.5-turbo", // or "gpt-3.5-turbo"
-            "messages": [
-                ["role": "system", "content": "You are a compassionate and professional therapist. Your goal is to help the user explore their feelings, identify challenges, and discover solutions or coping strategies in a supportive and non-judgmental way. Use active listening, open-ended questions, and empathetic responses to guide the conversation. Avoid giving direct advice; instead, encourage self-reflection and personal growth. Always maintain a calm and reassuring tone."]
-            ],
+            "model": "gpt-3.5-turbo",
+            "messages": requestMessages,
             "temperature": 0.7
         ]
 
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        performRequest(request: request, completion: completion)
+    }
 
+    func sendMessage(message: String, completion: @escaping (Result<String, Error>) -> Void) {
+        let messages = [
+            OpenAIChatMessage(
+                role: "system",
+                content: "You are a compassionate and professional therapist. Your goal is to help the user explore their feelings, identify challenges, and discover solutions or coping strategies in a supportive and non-judgmental way. Use active listening, open-ended questions, and empathetic responses to guide the conversation. Avoid giving direct advice; instead, encourage self-reflection and personal growth. Always maintain a calm and reassuring tone."
+            ),
+            OpenAIChatMessage(role: "user", content: message)
+        ]
+        sendMessage(messages: messages, completion: completion)
+    }
+
+    private func performRequest(request: URLRequest, completion: @escaping (Result<String, Error>) -> Void) {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 completion(.failure(error))

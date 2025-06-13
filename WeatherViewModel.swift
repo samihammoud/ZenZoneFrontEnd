@@ -6,14 +6,15 @@
 //
 
 import Foundation
+import Combine
 
-@Observable class WeatherViewModel{
+final class WeatherViewModel: ObservableObject {
     // Properties to be updated, automatically reflecting in the view
-     var title: String = "-"
-     var description: String = "-"
-     var temperature: String = "-"
-     var timeZone: String = "-"
-     var imageURL: String = "-"
+    @Published var title: String = "-"
+    @Published var description: String = "-"
+    @Published var temperature: String = "-"
+    @Published var timeZone: String = "-"
+    @Published var imageURL: String = "-"
 
     
     init() {
@@ -53,5 +54,3 @@ import Foundation
         task.resume()
     }
 }
-
-
