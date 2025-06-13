@@ -100,7 +100,7 @@ struct BackgroundWrapper<Content: View>: View {
 
 struct WeatherView: View {
     //Use State with simple one view lifecycles,
-    @State var viewModel = WeatherViewModel()
+    @StateObject var viewModel = WeatherViewModel()
     
     var body: some View {
         VStack {
@@ -145,6 +145,5 @@ struct WeatherView: View {
 
 
 #Preview {
-    let meditationHandler = MeditationHandler() // Initialize MeditationHandler
-    return ContentView(meditationHandler: meditationHandler) // Explicitly return the view
+    ContentView()
 }

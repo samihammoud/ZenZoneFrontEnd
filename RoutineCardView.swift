@@ -12,7 +12,7 @@ struct RoutineCardView: View {
     
     // Using ObservedObject to subscribe to published changes
     @ObservedObject var meditationVM: MeditationViewModel
-    @StateObject var meditationHandler: MeditationHandler
+    @ObservedObject var meditationHandler: MeditationHandler
 
     
     // State variable to drive the shake animation
@@ -54,7 +54,7 @@ struct RoutineCardView: View {
 
 struct Favorite: View {
     @ObservedObject var meditationVM: MeditationViewModel
-    @StateObject var meditationHandler: MeditationHandler
+    @ObservedObject var meditationHandler: MeditationHandler
 
 
     var body: some View {
