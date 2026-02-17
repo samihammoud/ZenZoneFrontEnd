@@ -6,10 +6,9 @@
 //
 
 import Foundation
-import SwiftUI
 import Combine
 
-class MeditationHandler: ObservableObject, Identifiable {
+final class MeditationHandler: ObservableObject, Identifiable {
     @Published var isAnyPlaying: Bool = false
 
     @Published var meditationArray: [MeditationViewModel] = [
@@ -31,4 +30,3 @@ class MeditationHandler: ObservableObject, Identifiable {
         print("Updated favorites: \(meditationFavoriteArray.map { $0.meditation.title })")
     }
 }
-

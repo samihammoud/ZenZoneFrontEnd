@@ -8,13 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    // Shared state objects, MeditationHandler is class of MeditationView Models
-    //meditation view models wrap meditation objects
-    //all views are referencing the same object, which is why instantiated in content View from a top down level
-    @StateObject var meditationHandler = MeditationHandler()
+    @StateObject private var meditationHandler = MeditationHandler()
 
-    @State private var selection = 1 // Tab selection
-    @State private var newMessage = "" // Message input for the chat
+    @State private var selection = 1
 
     var body: some View {
         NavigationView {
