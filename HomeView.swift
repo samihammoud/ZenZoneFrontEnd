@@ -29,20 +29,22 @@ struct HomeView: View {
                         }
                         
                         // "Today's Rec" Section
-                        VStack {
-                            Text("Zen's Rec")
-                                .font(.largeTitle) // Bigger size
-                                .fontWeight(.bold) // Bold font
-                                .multilineTextAlignment(.center) // Center alignment
-                                .padding(.bottom, 6) // Space below the text
-                                .foregroundColor(.white)
+                        if let recommendation = meditationHandler.meditationArray.first {
+                            VStack {
+                                Text("Zen's Rec")
+                                    .font(.largeTitle) // Bigger size
+                                    .fontWeight(.bold) // Bold font
+                                    .multilineTextAlignment(.center) // Center alignment
+                                    .padding(.bottom, 6) // Space below the text
+                                    .foregroundColor(.white)
 
-                            RoutineCardView(
-                                meditationVM: MeditationViewModel(meditation: Meditation.data),
-                                meditationHandler: meditationHandler
-                            )
+                                RoutineCardView(
+                                    meditationVM: recommendation,
+                                    meditationHandler: meditationHandler
+                                )
+                            }
+                            .frame(maxWidth: .infinity, alignment: .center) // Ensure VStack is centered
                         }
-                        .frame(maxWidth: .infinity, alignment: .center) // Ensure VStack is centered
 
                         
                         Spacer()
@@ -58,11 +60,12 @@ struct HomeView: View {
 
     // Computed property to filter meditations based on the searchText
     private var filteredMeditations: [MeditationViewModel] {
-        if searchText.isEmpty {
+        let trimmedQuery = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedQuery.isEmpty {
             return meditationHandler.meditationArray
         } else {
             return meditationHandler.meditationArray.filter {
-                $0.meditation.title.localizedCaseInsensitiveContains(searchText)
+                $0.meditation.title.localizedCaseInsensitiveContains(trimmedQuery)
             }
         }
     }
@@ -106,16 +109,5 @@ struct HomeView: View {
 
 
 #Preview {
-    // Create mock data for preview
-    let sampleMeditations = [
-        Meditation(title: "1 min Relaxation", description: "Quick relaxation session.", duration: "1 min", track: "track1", isFavorite: true),
-        Meditation(title: "5 min Calm", description: "Calm your mind and body.", duration: "5 min", track: "track2", isFavorite: false),
-        Meditation(title: "10 min Focus", description: "Boost your focus with mindfulness.", duration: "10 min", track: "track3", isFavorite: true)
-    ]
-    
-    let sampleMeditationHandler = MeditationHandler()
-    sampleMeditationHandler.meditationArray = sampleMeditations.map { MeditationViewModel(meditation: $0) }
-
-    return HomeView(meditationHandler: sampleMeditationHandler)
+    HomeView(meditationHandler: MeditationHandler())
 }
-
