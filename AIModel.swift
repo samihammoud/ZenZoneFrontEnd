@@ -6,9 +6,12 @@
 
 import Foundation
 
-// Define a ChatMessage struct with id, message, and isUser properties.
 struct ChatMessage: Identifiable {
-    var id = UUID()
-    var message: String
-    var isUser: Bool
+    let id = UUID()
+    let message: String
+    let isUser: Bool
+
+    var displayText: String {
+        "\(isUser ? "You" : "Bot"): \(message)"
+    }
 }

@@ -5,7 +5,6 @@
 //  Created by Sami Hammoud on 12/6/24.
 //
 
-import SwiftUI
 import Foundation
 
 struct OpenAIChatMessage {
@@ -32,11 +31,23 @@ struct OpenAIError: Codable {
     let error: ErrorDetails
 }
 
+protocol OpenAIChatServicing {
+    func sendMessage(messages: [OpenAIChatMessage], completion: @escaping (Result<String, Error>) -> Void)
+}
+
 // MARK: - OpenAI Chat Service
-class OpenAIChatService {
-    let openAIKey = ProcessInfo.processInfo.environment["OPENAI_API_KEY"] ?? ""
+final class OpenAIChatService: OpenAIChatServicing {
+    static let systemPrompt = "You are a compassionate and professional therapist. Your goal is to help the user explore their feelings, identify challenges, and discover solutions or coping strategies in a supportive and non-judgmental way. Use active listening, open-ended questions, and empathetic responses to guide the conversation. Avoid giving direct advice; instead, encourage self-reflection and personal growth. Always maintain a calm and reassuring tone."
+    static let greeting = "Hello. I am Zen, your personal therapist, here to help you with your problems. What's going on today?"
+
+    private let openAIKey = ProcessInfo.processInfo.environment["OPENAI_API_KEY"] ?? ""
 
     func sendMessage(messages: [OpenAIChatMessage], completion: @escaping (Result<String, Error>) -> Void) {
+        guard !openAIKey.isEmpty else {
+            completion(.failure(NSError(domain: "Missing API key: OPENAI_API_KEY", code: 0, userInfo: nil)))
+            return
+        }
+
         guard let url = URL(string: "https://api.openai.com/v1/chat/completions") else {
             completion(.failure(NSError(domain: "InvalidURL", code: 1, userInfo: nil)))
             return
@@ -62,7 +73,7 @@ class OpenAIChatService {
         let messages = [
             OpenAIChatMessage(
                 role: "system",
-                content: "You are a compassionate and professional therapist. Your goal is to help the user explore their feelings, identify challenges, and discover solutions or coping strategies in a supportive and non-judgmental way. Use active listening, open-ended questions, and empathetic responses to guide the conversation. Avoid giving direct advice; instead, encourage self-reflection and personal growth. Always maintain a calm and reassuring tone."
+                content: Self.systemPrompt
             ),
             OpenAIChatMessage(role: "user", content: message)
         ]

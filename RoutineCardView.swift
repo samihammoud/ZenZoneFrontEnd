@@ -14,10 +14,6 @@ struct RoutineCardView: View {
     @ObservedObject var meditationVM: MeditationViewModel
     @ObservedObject var meditationHandler: MeditationHandler
 
-    
-    // State variable to drive the shake animation
-    @State private var shakeTrigger: CGFloat = 0
-
     var body: some View {
         VStack {
             Text(meditationVM.meditation.title)
@@ -61,7 +57,6 @@ struct Favorite: View {
         Button(action: {
             meditationVM.toggleFavorite()
             meditationHandler.updateFavorites()
-            print("toggle!")
         }) {
             Image(systemName: meditationVM.isFavorite ? "star.fill" : "star")
                 .foregroundColor(meditationVM.isFavorite ? .yellow : .gray)
