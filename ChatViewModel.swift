@@ -21,6 +21,10 @@ final class ChatViewModel: ObservableObject {
         self.conversationHistory = [
             OpenAIChatMessage(role: "system", content: OpenAIChatService.systemPrompt),
             OpenAIChatMessage(role: "assistant", content: OpenAIChatService.greeting)
+            ChatMessage(
+                message: "Hello. I am Zen, your personal therapist, here to help you with your problems. What's going on today?",
+                isUser: false
+            )
         ]
     }
 
@@ -39,6 +43,7 @@ final class ChatViewModel: ObservableObject {
 
         let requestHistory = conversationHistory
         chatService.sendMessage(messages: requestHistory) { [weak self] result in
+        chatService.sendMessage(message: trimmedInput) { [weak self] result in
             guard let self else { return }
             DispatchQueue.main.async {
                 switch result {

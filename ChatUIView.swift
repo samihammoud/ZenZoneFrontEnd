@@ -8,6 +8,23 @@ import SwiftUI
 
 struct ChatUIView: View {
     @StateObject private var viewModel = ChatViewModel()
+    private let systemPrompt = "You are a compassionate and professional therapist. Your goal is to help the user explore their feelings, identify challenges, and discover solutions or coping strategies in a supportive and non-judgmental way. Use active listening, open-ended questions, and empathetic responses to guide the conversation. Avoid giving direct advice; instead, encourage self-reflection and personal growth. Always maintain a calm and reassuring tone."
+
+    @State private var userInput = ""
+    @State private var messages: [String] = ["Bot: Hello. I am Zen, your personal therapist, here to help you with your problems. What's going on today?"]
+    @State private var conversationHistory: [OpenAIChatMessage] = [
+        OpenAIChatMessage(
+            role: "system",
+            content: "You are a compassionate and professional therapist. Your goal is to help the user explore their feelings, identify challenges, and discover solutions or coping strategies in a supportive and non-judgmental way. Use active listening, open-ended questions, and empathetic responses to guide the conversation. Avoid giving direct advice; instead, encourage self-reflection and personal growth. Always maintain a calm and reassuring tone."
+        ),
+        OpenAIChatMessage(
+            role: "assistant",
+            content: "Hello. I am Zen, your personal therapist, here to help you with your problems. What's going on today?"
+        )
+    ]
+    @State private var isSending = false
+
+    private let chatService = OpenAIChatService()
 
     var body: some View {
         VStack {
@@ -47,6 +64,31 @@ struct ChatUIView: View {
             .padding()
         }
     }
+
+    private func sendMessage() {
+        guard !userInput.isEmpty else { return }
+        isSending = true
+        let userMessage = userInput
+        messages.append("You: \(userMessage)")
+        conversationHistory.append(OpenAIChatMessage(role: "user", content: userMessage))
+        userInput = ""
+
+        chatService.sendMessage(messages: conversationHistory) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let reply):
+                    messages.append("Bot: \(reply)")
+                    conversationHistory.append(OpenAIChatMessage(role: "assistant", content: reply))
+                case .failure(let error):
+                    messages.append("Bot: Error - \(error.localizedDescription)")
+                    if conversationHistory.isEmpty {
+                        conversationHistory.append(OpenAIChatMessage(role: "system", content: systemPrompt))
+                    }
+                }
+                isSending = false
+            }
+        }
+    }
 }
 
 struct ChatUIView_Previews: PreviewProvider {
@@ -54,3 +96,4 @@ struct ChatUIView_Previews: PreviewProvider {
         ChatUIView()
     }
 }
+

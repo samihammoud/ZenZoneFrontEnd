@@ -44,6 +44,10 @@ final class OpenAIChatService {
             return
         }
 
+class OpenAIChatService {
+    let openAIKey = ProcessInfo.processInfo.environment["OPENAI_API_KEY"] ?? ""
+
+    func sendMessage(messages: [OpenAIChatMessage], completion: @escaping (Result<String, Error>) -> Void) {
         guard let url = URL(string: "https://api.openai.com/v1/chat/completions") else {
             completion(.failure(NSError(domain: "InvalidURL", code: 1, userInfo: nil)))
             return
@@ -70,6 +74,7 @@ final class OpenAIChatService {
             OpenAIChatMessage(
                 role: "system",
                 content: Self.systemPrompt
+                content: "You are a compassionate and professional therapist. Your goal is to help the user explore their feelings, identify challenges, and discover solutions or coping strategies in a supportive and non-judgmental way. Use active listening, open-ended questions, and empathetic responses to guide the conversation. Avoid giving direct advice; instead, encourage self-reflection and personal growth. Always maintain a calm and reassuring tone."
             ),
             OpenAIChatMessage(role: "user", content: message)
         ]
